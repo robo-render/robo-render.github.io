@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>RoboRender | Robot-Oriented Video Generation for Visual Sim-to-Real Transfer</title>
+  <meta name="description" content="RoboRender converts simulated robot trajectories into photorealistic RGB videos for zero-shot visual sim-to-real policy transfer.">
+
+  <!-- TODO: add static/images/preview-card.jpg (1920x1080) before sharing on social -->
+  <meta property="og:title" content="RoboRender: Robot-Oriented Video Generation for Visual Sim-to-Real Transfer">
+  <meta property="og:description" content="RoboRender converts simulated robot trajectories into photorealistic RGB videos for zero-shot visual sim-to-real policy transfer.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="./static/images/preview-card.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="RoboRender: Robot-Oriented Video Generation for Visual Sim-to-Real Transfer">
+  <meta name="twitter:description" content="RoboRender converts simulated robot trajectories into photorealistic RGB videos for zero-shot visual sim-to-real policy transfer.">
+  <meta name="twitter:image" content="./static/images/preview-card.jpg">
+
+  <link rel="icon" type="image/png" href="./static/images/roborender-icon.png">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <!-- Only deviation from the stock Nerfies template: Stanford Cardinal title,
+       matching behavior-robot-suite.github.io and stereopolicy.github.io. -->
+  <style>
+    .publication-title { color: #8C1515; }
+  </style>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  <script defer src="./static/js/tasks.js"></script>
+</head>
+<body>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">RoboRender: Robot-Oriented Video Generation for Visual Sim-to-Real Transfer</h1>
+          <!-- TODO (de-anonymize at camera ready): restore the real author list,
+               links and affiliation superscripts from the Overleaf source. -->
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Anonymous Authors</span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Under review at CoRL 2026</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- TODO: real arXiv / paper / data URLs once available -->
+              <span class="link-block">
+                <a href="#" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="#" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/robo-render" class="external-link button is-normal is-rounded is-dark" target="_blank" rel="noopener">
+                  <span class="icon">
+                    <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <video id="teaser" autoplay muted loop playsinline height="100%">
+        <source src="./static/videos/overview.mp4"
+                type="video/mp4">
+      </video>
+      <h2 class="subtitle has-text-centered">
+        From simulation trajectories, <b>RoboRender</b> generates diverse and photorealistic videos
+        oriented for visual sim-to-real robot policy transfer, supporting multi-view consistency,
+        distractor insertion, and cross-embodiment generation.
+      </h2>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Simulation enables large-scale, low-cost robot data generation, but policies trained in
+            simulation often fail to transfer to the real world due to the sim-to-real visual
+            discrepancies. Existing approaches often rely on intermediate representations, which can
+            discard rich semantic information or require additional perception modules at deployment.
+            We address this visual sim-to-real gap with RoboRender, a framework that converts
+            simulated trajectories into photorealistic RGB videos for policy learning. RoboRender
+            trains a robot-oriented video generation model conditioned on simulated depth videos,
+            language instructions, and robot RGB mask videos, preserving simulator geometry, robot
+            motion, and action labels while synthesizing realistic textures, backgrounds, and
+            distractors. The generated RGB videos are paired with simulator-provided states and
+            actions to train policies for zero-shot real-world deployment. On robot video test sets,
+            our video generation model outperforms depth-conditioned video generation baselines in
+            video generation quality. In real-world experiments across pick-and-place,
+            articulated-object manipulation, and mobile manipulation tasks, policies trained on
+            RoboRender-generated data achieve a 71% average success rate, outperforming raw
+            simulation renderings and conventional visual domain randomization by approximately
+            6.5&times; and 3&times;, respectively. We further show that policy performance improves
+            with more generated videos per simulation trajectory, increasing opening-task success by
+            65 percentage points. These results demonstrate that generative video rendering mitigates
+            the visual sim-to-real gap for zero-shot policy transfer.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+
+    <!-- Video. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Video</h2>
+        <video id="walkthrough" controls playsinline preload="metadata" height="100%">
+          <source src="./static/videos/walkthrough.mp4"
+                  type="video/mp4">
+        </video>
+      </div>
+    </div>
+    <!--/ Video. -->
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">How It Works</h2>
+        <div class="content has-text-justified">
+          <p>
+            RoboRender adapts Wan2.1-T2V-1.3B into a <i>robot-oriented</i> renderer, fine-tuned on
+            ~130k real-world robot manipulation samples (~70k from AgiBot-World-Alpha, ~60k from
+            DROID) at 416&times;240.
+            Simulated <b>depth</b> fixes scene geometry and object motion, a <b>robot RGB mask</b>
+            fixes embodiment and arm motion, and a <b>language prompt</b> controls appearance &mdash;
+            textures, materials, lighting and background semantics. Because geometry and actions come
+            from the simulator, every generated video inherits exact action labels for policy
+            learning.
+          </p>
+        </div>
+        <figure class="image">
+          <img src="./static/images/fig2_model.png" alt="RoboRender video generation model">
+        </figure>
+        <div class="content has-text-justified">
+          <p>
+            During training, raw RGB videos are VAE-encoded and noised to form the diffusion input.
+            Per-view depth and robot-arm RGB mask videos are encoded as spatial conditions, while
+            CLIP-encoded language prompts and previous-frame inputs provide semantic and temporal
+            conditioning. Per-view condition latents are concatenated with the noised latents and
+            stacked into a unified multi-view latent, which is denoised and decoded into RGB videos.
+          </p>
+        </div>
+
+        <video id="method" autoplay muted loop playsinline height="100%">
+          <source src="./static/videos/method_demo.mp4"
+                  type="video/mp4">
+        </video>
+        <div class="content has-text-justified">
+          <p>
+            Conditioning signals (RGB, simulated depth, robot mask) and the resulting photorealistic
+            generation, with the language prompt used for each sample.
+          </p>
+        </div>
+
+        <div class="content has-text-justified">
+          <ul>
+            <li>
+              <b>Multi-view consistency.</b> Views are stacked into a unified multi-view latent
+              rather than generated independently, so shared objects stay consistent across the
+              external and wrist cameras.
+            </li>
+            <li>
+              <b>Long-horizon rollouts.</b> Generation is autoregressive: each chunk is conditioned
+              on the previous chunk's last frame, so variable-length demonstrations can exceed the
+              model's fixed frame window.
+            </li>
+            <li>
+              <b>Cross-embodiment generation.</b> Robot-mask conditioning lets the model render
+              embodiments it never saw in training, including the R1Pro used for mobile
+              manipulation.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Video Generation Quality</h2>
+        <div class="content has-text-justified">
+          <p>
+            We evaluate the video model on 500 held-out clips from DROID and AgiBot under two
+            inference-matched settings: <i>first-chunk generation</i>, which synthesizes the initial
+            chunk without previous-frame conditioning, and <i>autoregressive continuation</i>, which
+            generates a chunk conditioned on a ground-truth previous frame.
+          </p>
+        </div>
+
+        <figure class="image">
+          <img src="./static/images/fig3_comparison.png" alt="Visual comparison of video generation">
+        </figure>
+        <div class="content has-text-justified">
+          <p>
+            Given the same depth conditions, RoboRender produces realistic video while preserving
+            object consistency across views. The baselines lack multi-view consistency, so shared
+            objects such as the table vary between views.
+          </p>
+        </div>
+
+        <h3 class="title is-4">Quantitative results</h3>
+        <div class="table-container">
+          <table class="table is-bordered is-narrow is-fullwidth has-text-centered">
+            <thead>
+              <tr>
+                <th></th>
+                <th colspan="2">First-chunk</th>
+                <th colspan="3">AR continuation</th>
+              </tr>
+              <tr>
+                <th>Model</th>
+                <th>FID &darr;</th>
+                <th>FVD &darr;</th>
+                <th>PSNR &uarr;</th>
+                <th>SSIM &uarr;</th>
+                <th>LPIPS &darr;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Wan-Fun-Control</td>
+                <td>62.5</td><td>267.8</td><td>20.30</td><td>0.738</td><td>0.175</td>
+              </tr>
+              <tr>
+                <td>Cosmos-Transfer2.5</td>
+                <td>42.8</td><td>164.5</td><td>13.26</td><td>0.481</td><td>0.423</td>
+              </tr>
+              <tr>
+                <td>RoboTransfer</td>
+                <td>52.8</td><td>275.4</td><td>13.75</td><td>0.509</td><td>0.418</td>
+              </tr>
+              <tr>
+                <td><b>RoboRender</b></td>
+                <td><b>25.7</b></td><td><b>93.9</b></td><td><b>22.28</b></td><td><b>0.784</b></td><td><b>0.142</b></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="columns is-centered">
+          <div class="column is-four-fifths">
+            <figure class="image">
+              <img src="./static/images/fig4_ar_quality.png" alt="Per-frame PSNR and LPIPS along 15-second autoregressive rollouts">
+            </figure>
+          </div>
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            Per-frame PSNR and LPIPS along 15-second autoregressive rollouts, sampled every 3
+            seconds. RoboRender leads at every step, so quality holds up across the repeated
+            autoregressive steps needed to render a full simulation trajectory.
+          </p>
+        </div>
+
+        <h3 class="title is-4">Human study</h3>
+        <div class="content has-text-justified">
+          <p>
+            A two-alternative forced-choice (2AFC) study run on Prolific. Numbers are the rate at
+            which raters favour RoboRender over each baseline.
+          </p>
+        </div>
+        <div class="table-container">
+          <table class="table is-bordered is-narrow is-fullwidth has-text-centered">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Multi-view consistency</th>
+                <th>Generation quality</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>over Wan-Fun-Control</td><td>76.9%</td><td>90.6%</td></tr>
+              <tr><td>over Cosmos-Transfer2.5</td><td>74.9%</td><td>68.9%</td></tr>
+              <tr><td>over RoboTransfer</td><td>85.7%</td><td>94.6%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Generated Videos</h2>
+        <div class="content has-text-justified">
+          <p>
+            Every clip below is produced by RoboRender from a simulated trajectory plus a scene
+            description. Depth and robot-mask conditioning hold the geometry and the arm motion to
+            the simulator, so the action labels stay valid, while the language prompt determines the
+            room, materials and lighting. Pick a task to see nine generated episodes, chosen to be
+            as visually distinct from each other as possible. Each tile stacks the camera views for
+            that episode &mdash; external and wrist for the Franka tasks, head and both wrists for
+            the R1Pro, ego and wrist for the Yam &mdash; so multi-view consistency is visible
+            directly.
+          </p>
+        </div>
+
+        <div class="field">
+          <label class="label" for="task-select">Task</label>
+          <div class="control">
+            <div class="select">
+              <select id="task-select"></select>
+            </div>
+          </div>
+          <p class="help" id="task-note"></p>
+        </div>
+
+        <div class="columns is-multiline" id="task-videos"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Real-World Rollouts</h2>
+        <div class="content has-text-justified">
+          <p>
+            Policies are trained purely on RoboRender-generated video and deployed zero-shot.
+            Evaluations run in a natural office environment, with object size, geometry, camera
+            viewpoint and background all differing from simulation. One successful rollout is shown
+            per task, across all three embodiments. All clips play at 2&times; speed.
+          </p>
+        </div>
+
+        <div class="columns is-multiline is-centered">
+          <div class="column is-half">
+            <video autoplay muted loop playsinline height="100%">
+              <source src="./static/videos/real/mug.mp4" type="video/mp4">
+            </video>
+            <p class="has-text-centered is-size-6"><b>Mug</b><br><span class="is-size-7">Droid</span></p>
+          </div>
+          <div class="column is-half">
+            <video autoplay muted loop playsinline height="100%">
+              <source src="./static/videos/real/bowl.mp4" type="video/mp4">
+            </video>
+            <p class="has-text-centered is-size-6"><b>Bowl</b><br><span class="is-size-7">Droid</span></p>
+          </div>
+          <div class="column is-half">
+            <video autoplay muted loop playsinline height="100%">
+              <source src="./static/videos/real/apple.mp4" type="video/mp4">
+            </video>
+            <p class="has-text-centered is-size-6"><b>Apple</b><br><span class="is-size-7">Droid</span></p>
+          </div>
+          <div class="column is-half">
+            <video autoplay muted loop playsinline height="100%">
+              <source src="./static/videos/real/egg.mp4" type="video/mp4">
+            </video>
+            <p class="has-text-centered is-size-6"><b>Egg</b><br><span class="is-size-7">Droid</span></p>
+          </div>
+          <div class="column is-half">
+            <video autoplay muted loop playsinline height="100%">
+              <source src="./static/videos/real/fridge.mp4" type="video/mp4">
+            </video>
+            <p class="has-text-centered is-size-6"><b>Open the fridge</b><br><span class="is-size-7">Droid</span></p>
+          </div>
+          <div class="column is-half">
+            <video autoplay muted loop playsinline height="100%">
+              <source src="./static/videos/real/drawer.mp4" type="video/mp4">
+            </video>
+            <p class="has-text-centered is-size-6"><b>Open the drawer</b><br><span class="is-size-7">Droid</span></p>
+          </div>
+          <div class="column is-half">
+            <video autoplay muted loop playsinline height="100%">
+              <source src="./static/videos/real/radio.mp4" type="video/mp4">
+            </video>
+            <p class="has-text-centered is-size-6"><b>Pick up the radio</b><br><span class="is-size-7">R1Pro</span></p>
+          </div>
+          <div class="column is-half">
+            <video autoplay muted loop playsinline height="100%">
+              <source src="./static/videos/real/yam.mp4" type="video/mp4">
+            </video>
+            <p class="has-text-centered is-size-6"><b>Place the marker</b><br><span class="is-size-7">Yam &middot; side and wrist views</span></p>
+          </div>
+        </div>
+
+        <h3 class="title is-4">Real-world success rate across tasks</h3>
+        <div class="table-container">
+          <table class="table is-bordered is-narrow is-fullwidth has-text-centered">
+            <thead>
+              <tr>
+                <th></th>
+                <th colspan="6">Droid</th>
+                <th>R1Pro</th>
+                <th>Yam</th>
+                <th></th>
+              </tr>
+              <tr>
+                <th>Data</th>
+                <th>Mug</th>
+                <th>Bowl</th>
+                <th>Apple</th>
+                <th>Egg</th>
+                <th>Open Fridge</th>
+                <th>Open Drawer</th>
+                <th>Pick up Radio</th>
+                <th>Place Blue Marker</th>
+                <th>Avg.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Sim</td>
+                <td>40%</td><td>30%</td><td>10%</td><td>0%</td><td>0%</td><td>0%</td><td>0%</td><td>0%</td>
+                <td>10%</td>
+              </tr>
+              <tr>
+                <td>Sim + DR</td>
+                <td>60%</td><td>20%</td><td>20%</td><td>30%</td><td>0%</td><td>0%</td><td>30%</td><td>5%</td>
+                <td>21%</td>
+              </tr>
+              <tr>
+                <td><b>RoboRender</b></td>
+                <td><b>80%</b></td><td><b>80%</b></td><td><b>60%</b></td><td><b>50%</b></td>
+                <td><b>70%</b></td><td><b>90%</b></td>
+                <td><b>70%</b></td><td><b>70%</b></td>
+                <td><b>71%</b></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            Each task is evaluated over 10 rollouts with varied robot starts and object locations.
+            Pick-and-place tasks additionally include random table distractors.
+          </p>
+        </div>
+
+        <h3 class="title is-4">Success rate by task category</h3>
+        <div class="columns is-centered">
+          <div class="column is-four-fifths">
+            <figure class="image">
+              <img src="./static/images/fig6_category_sr.png" alt="Average success rate of each task category for each method">
+            </figure>
+          </div>
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            For the pick-and-place category, the lighter <i>hatched</i> extension on each bar shows
+            the same method evaluated without distractor objects. The largest gains are on the
+            opening tasks, where RoboRender is the only method with non-zero success &mdash; these
+            require recognizing fine visual details such as drawer and fridge handles whose textures
+            resemble the object body.
+          </p>
+        </div>
+
+        <h3 class="title is-4">Scaling generated videos per trajectory</h3>
+        <figure class="image">
+          <img src="./static/images/fig7_scaling.png" alt="Policy success rate versus the number of generated videos per unique simulation trajectory">
+        </figure>
+        <div class="content has-text-justified">
+          <p>
+            Policy success rate against the number of videos generated per <i>unique</i> simulation
+            trajectory, for pick-and-place (left) and opening (right). Solid green is the
+            per-category average, dash-dot lines the individual tasks, and dotted red the reference
+            policy trained with 2&times; more simulation trajectories. Performance improves with more
+            generated videos even though the underlying set of unique simulation trajectories is
+            unchanged.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@inproceedings{anonymous2026roborender,
+  author    = {Anonymous Authors},
+  title     = {RoboRender: Robot-Oriented Video Generation for Visual Sim-to-Real Transfer},
+  booktitle = {Under review at the Conference on Robot Learning (CoRL)},
+  year      = {2026},
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            This website borrows the <a href="https://github.com/nerfies/nerfies.github.io">source
+            code</a> of the <a href="https://nerfies.github.io">Nerfies</a> project page.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

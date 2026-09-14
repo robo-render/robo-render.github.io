@@ -1,0 +1,4 @@
+# Temporary: the project page is still a work in progress (placeholder authors,
+# unpublished paper). Delete this file at launch to allow indexing.
+User-agent: *
+Disallow: /
