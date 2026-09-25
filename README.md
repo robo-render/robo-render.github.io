@@ -1,6 +1,10 @@
 # RoboRender — project page
 
-Source for <https://robo-render.github.io>.
+Source for <https://robo-render.github.io> (public release page).
+
+The anonymous review copy is a **separate** repo, `anonymous2662/anonymous2662.github.io`,
+built as a single commit with this README excluded. Keep author-identifying details out of
+that repo; this one may carry them.
 
 Static HTML: no build step, no Jekyll (`.nojekyll` is present). Edit `index.html` and push to
 `main`; GitHub Pages serves the repo root.
@@ -14,8 +18,9 @@ static/css/, static/js/    # vendored Nerfies/Bulma template assets, unmodified
 ```
 
 Styling is the stock [Nerfies](https://github.com/nerfies/nerfies.github.io) template. The only
-deviation is a single rule in a `<style>` block in `index.html`, setting the title colour to
-`#8C1515`. Please keep new styling out of
+deviation is a single rule in a `<style>` block in `index.html`, setting the title to Stanford
+Cardinal `#8C1515` to match `behavior-robot-suite.github.io` and `stereopolicy.github.io`.
+Please keep new styling out of
 the vendored CSS and out of the page unless it is genuinely needed.
 
 ## Videos
@@ -59,18 +64,19 @@ fridge [5, 8, 0, 7, 10, 3, 4, 6, 2]
 marker [s920003, s946014, s950022, s948016, s933006, s922006, s928025, s957018, s935011]
 ```
 
-Sources (public HF datasets; account names withheld for anonymous review --
-see `PROVENANCE.local.md`, gitignored):
+Sources (all public HF datasets):
 
 | Task | Repo | Path |
 |---|---|---|
-| mug, bowl, apple, egg | `<hf-account>/s2rg_<task>_depthpatch_500x3_0527` | `videos/chunk-000/observation.real.rgb.external_1/episode_00000N.mp4` |
-| radio | `<hf-account>/s2rg_radio_s2rg_0524` | `videos/chunk-000/observation.real.rgb.head/episode_00000N.mp4` |
-| drawer | `<hf-account-2>/generated_video` | `dresser/gen/chunk_001/generated_episode_0000000N_exo_camera_1_batch_1_of_1_cam_rand.mp4` |
-| fridge | `<hf-account-2>/generated_video` | `fridge_m_v2/gen_chunks/chunk_001/generated_episode_0000000N_exo_camera_1_batch_{1..4}_of_4_cam_rand.mp4` (concatenated) |
+| mug, bowl, apple, egg | `wensi-ai/s2rg_<task>_depthpatch_500x3_0527` | `videos/chunk-000/observation.real.rgb.external_1/episode_00000N.mp4` |
+| radio | `wensi-ai/s2rg_radio_s2rg_0524` | `videos/chunk-000/observation.real.rgb.head/episode_00000N.mp4` |
+| drawer | `Ravenh97/generated_video` | `dresser/gen/chunk_001/generated_episode_0000000N_exo_camera_1_batch_1_of_1_cam_rand.mp4` |
+| fridge | `Ravenh97/generated_video` | `fridge_m_v2/gen_chunks/chunk_001/generated_episode_0000000N_exo_camera_1_batch_{1..4}_of_4_cam_rand.mp4` (concatenated) |
 | marker (Yam) | `teacher_videos.zip`, supplied locally | `teacher_videos/episode_sNNNNNN_{ego,wrist}.mp4` |
+| distractor clips | `wensi-ai/s2rg_<task>_depthcrop_0519` (cluster copy carries depth + masks) | mug e7, bowl e38, apple e0, egg e31 |
+| wan / cosmos baselines | `Ravenh97/generated_video` | `3drawers`, `fridge_m_2house`, `cosmos_*` |
 
-**Careful:** `<hf-account-2>/generated_video` also has `wan_*` directories -- those are the
+**Careful:** `Ravenh97/generated_video` also has `wan_*` directories -- those are the
 Wan-Fun-Control *baseline*, not RoboRender. Confirm against each variant's `GEN_SETUP.md`.
 It also holds several fridge/drawer variants; `fridge_m_v2` and `dresser` were chosen because
 they are the ones with a `GEN_SETUP.md` recording the RoboRender LoRA.
