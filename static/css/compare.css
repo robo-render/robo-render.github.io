@@ -947,3 +947,17 @@ section h3.title.is-4 {
   display: block;
 }
 
+
+/* Affiliation row: wider gaps than the author list, standing in for \qquad. */
+.publication-affiliations {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.25rem 2.25rem;
+  margin-top: 0.35rem;
+}
+
+.publication-equal {
+  margin-top: 0.3rem;
+  color: #363636;
+}
